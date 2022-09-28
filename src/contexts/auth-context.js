@@ -1,5 +1,6 @@
 import { auth } from "firebase-app/firebase-config";
 import { onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const { createContext, useContext, useState, useEffect } = require("react");
 
@@ -14,7 +15,6 @@ function AuthProvider(props) {
   }, []);
   return <AuthContext.Provider value={value} {...props}></AuthContext.Provider>;
 }
-
 function useAuth() {
   const context = useContext(AuthContext);
   if (typeof context === "undefined")

@@ -31,7 +31,7 @@ const HomeNewest = () => {
   return (
     <HomeNewestStyles className="home-block">
       <div className="container">
-        <Heading>Bài viết mới nhất</Heading>
+        <Heading>Latest posts</Heading>
         <div className="layout">
           <PostNewestLarge></PostNewestLarge>
           <div className="sidebar">

@@ -1,13 +1,24 @@
 import { Button } from "components/button";
 import React from "react";
+import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 const DashboardHeaderStyles = styled.div`
   background-color: white;
   padding: 20px;
   border-bottom: 1px solid #eee;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 20px;
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 18px;
+    font-weight: 600;
+    img {
+      max-width: 40px;
+    }
+  }
   .header-avatar {
     width: 52px;
     height: 52px;
@@ -18,19 +29,30 @@ const DashboardHeaderStyles = styled.div`
       border-radius: 100rem;
     }
   }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
 `;
 
 const DashboardHeader = () => {
   return (
     <DashboardHeaderStyles>
-      <Button to="/dashboard" className="header-button" height="52px">
-        Write new post
-      </Button>
-      <div className="header-avatar">
-        <img
-          src="https://2sao.vietnamnetjsc.vn/images/2022/06/24/14/42/dat-villa-4.jpg"
-          alt=""
-        />
+      <NavLink to="/" className="logo">
+        <img srcSet="/logo.png 2x" alt="monkey-blogging" className="logo" />
+        <span className="hidden lg:inline-block">Monkey Blogging</span>
+      </NavLink>
+      <div className="header-right">
+        <Button to="/manage/add-post" className="header-button" height="52px">
+          Write new post
+        </Button>
+        <NavLink to="/profile" className="header-avatar">
+          <img
+            src="https://image2.tin247.news/pictures/2022/08/26/vuf1661462030.png"
+            alt=""
+          />
+        </NavLink>
       </div>
     </DashboardHeaderStyles>
   );

@@ -1,24 +1,29 @@
-import { Button } from "components/button";
-import { Radio } from "components/checkbox";
-import { Field } from "components/field";
-import { Input } from "components/input";
-import { Label } from "components/label";
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import slugify from "slugify";
-import styled from "styled-components";
-import { postStatus } from "utils/constants";
-// import ImageUpload from "components/image/ImageUpload";
-import ImageUpload from "components/image/ImageUpload";
 import useFirebaseImage from "hooks/useFirebaseImage";
 import Toggle from "components/toggle/Toggle";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "firebase-app/firebase-config";
-import { Dropdown } from "components/dropdown/index.js";
+import slugify from "slugify";
+import React, { useEffect, useState } from "react";
+import ImageUpload from "components/image/ImageUpload";
+import { useForm } from "react-hook-form";
 import { useAuth } from "contexts/auth-context";
 import { toast } from "react-toastify";
+import { Radio } from "components/checkbox";
+import { postStatus } from "utils/constants";
+import { Label } from "components/label";
+import { Input } from "components/input";
+import { Field, FieldCheckboxes } from "components/field";
+import { Dropdown } from "components/dropdown";
+import { db } from "firebase-app/firebase-config";
+import { Button } from "components/button";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  query,
+  serverTimestamp,
+  where,
+} from "firebase/firestore";
+import DashboardHeading from "module/dashboard/DashboardHeading";
 
-const PostAddNewStyles = styled.div``;
 const PostAddNew = () => {
   const { userInfo } = useAuth();
   const { control, watch, setValue, handleSubmit, getValues, reset } = useForm({
@@ -34,31 +39,45 @@ const PostAddNew = () => {
   });
   const watchStatus = watch("status");
   const watchHot = watch("hot");
-  const { image, progress, handleSelectImage, handleDeleteImage } =
-    useFirebaseImage(setValue, getValues);
+  const {
+    image,
+    handleResetUpload,
+    progress,
+    handleSelectImage,
+    handleDeleteImage,
+  } = useFirebaseImage(setValue, getValues);
   const [categories, setCategories] = useState([]);
   const [selectCategory, setSelectCategory] = useState("");
-  // const watchCategory = watch("category");
+  const [loading, setLoading] = useState(false);
   const addPostHandler = async (values) => {
-    const cloneValues = { ...values };
-    cloneValues.slug = slugify(values.slug || values.title, { lower: true });
-    cloneValues.status = Number(values.status);
-    const colRef = collection(db, "posts");
-    await addDoc(colRef, {
-      ...cloneValues,
-      image,
-      userId: userInfo.uid,
-    });
-    toast.success("Create new post successfully");
-    reset({
-      title: "",
-      slug: "",
-      status: 2,
-      categoryId: "",
-      hot: false,
-      image: "",
-    });
-    setSelectCategory({});
+    setLoading(true);
+    try {
+      const cloneValues = { ...values };
+      cloneValues.slug = slugify(values.slug || values.title, { lower: true });
+      cloneValues.status = Number(values.status);
+      const colRef = collection(db, "posts");
+      await addDoc(colRef, {
+        ...cloneValues,
+        image,
+        userId: userInfo.uid,
+        createdAt: serverTimestamp(),
+      });
+      toast.success("Create new post successfully!");
+      reset({
+        title: "",
+        slug: "",
+        status: 2,
+        categoryId: "",
+        hot: false,
+        image: "",
+      });
+      handleResetUpload();
+      setSelectCategory({});
+    } catch (error) {
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -72,23 +91,25 @@ const PostAddNew = () => {
           id: doc.id,
           ...doc.data(),
         });
-        // console.log(doc.id, " => ", doc.data());
       });
-      // console.log("getData ~ result", result);
       setCategories(result);
     }
     getData();
   }, []);
+  useEffect(() => {
+    document.title = "Monkey Blogging - Add new post";
+  }, []);
+
   const handleClickOption = (item) => {
     setValue("categoryId", item.id);
     setSelectCategory(item);
   };
 
   return (
-    <PostAddNewStyles>
-      <h1 className="dashboard-heading">Add new post</h1>
+    <>
+      <DashboardHeading title="Add post" desc="Add new post"></DashboardHeading>
       <form onSubmit={handleSubmit(addPostHandler)}>
-        <div className="grid grid-cols-2 gap-x-10 mb-10">
+        <div className="form-layout">
           <Field>
             <Label>Title</Label>
             <Input
@@ -107,7 +128,7 @@ const PostAddNew = () => {
             ></Input>
           </Field>
         </div>
-        <div className="grid grid-cols-2 gap-x-10 mb-10">
+        <div className="form-layout">
           <Field>
             <Label>Image</Label>
             <ImageUpload
@@ -117,7 +138,6 @@ const PostAddNew = () => {
               progress={progress}
               image={image}
             ></ImageUpload>
-            {image}
           </Field>
           <Field>
             <Label>Category</Label>
@@ -142,9 +162,9 @@ const PostAddNew = () => {
             )}
           </Field>
         </div>
-        <div className="grid grid-cols-2 gap-x-10 mb-10">
+        <div className="form-layout">
           <Field>
-            <Label>Feature Post</Label>
+            <Label>Feature post</Label>
             <Toggle
               on={watchHot === true}
               onClick={() => setValue("hot", !watchHot)}
@@ -152,7 +172,7 @@ const PostAddNew = () => {
           </Field>
           <Field>
             <Label>Status</Label>
-            <div className="flex items-center gap-x-5">
+            <FieldCheckboxes className="flex items-center gap-5 flex-wrap">
               <Radio
                 name="status"
                 control={control}
@@ -177,14 +197,19 @@ const PostAddNew = () => {
               >
                 Reject
               </Radio>
-            </div>
+            </FieldCheckboxes>
           </Field>
         </div>
-        <Button type="submit" className="mx-auto">
+        <Button
+          type="submit"
+          className="mx-auto w-[250px]"
+          isLoading={loading}
+          disabled={loading}
+        >
           Add new post
         </Button>
       </form>
-    </PostAddNewStyles>
+    </>
   );
 };
 export default PostAddNew;
