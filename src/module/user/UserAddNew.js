@@ -4,6 +4,7 @@ import { Field, FieldCheckboxes } from "components/field";
 import ImageUpload from "components/image/ImageUpload";
 import { Input } from "components/input";
 import { Label } from "components/label";
+import { useAuth } from "contexts/auth-context";
 import { auth, db } from "firebase-app/firebase-config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
@@ -13,6 +14,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import slugify from "slugify";
+import Swal from "sweetalert2";
 import { userRole, userStatus } from "utils/constants";
 
 const UserAddNew = () => {
@@ -44,7 +46,12 @@ const UserAddNew = () => {
     handleSelectImage,
     handleDeleteImage,
   } = useFirebaseImage(setValue, getValues);
+  const { userInfo } = useAuth();
   const handleCreateUser = async (values) => {
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
     if (!isValid) return;
     try {
       await createUserWithEmailAndPassword(auth, values.email, values.password);

@@ -4,6 +4,8 @@ import { Field, FieldCheckboxes } from "components/field";
 import ImageUpload from "components/image/ImageUpload";
 import { Input } from "components/input";
 import { Label } from "components/label";
+import { Textarea } from "components/textarea";
+import { useAuth } from "contexts/auth-context";
 import { db } from "firebase-app/firebase-config";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import useFirebaseImage from "hooks/useFirebaseImage";
@@ -12,6 +14,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 import { userRole, userStatus } from "utils/constants";
 
 const UserUpdate = () => {
@@ -35,8 +38,13 @@ const UserUpdate = () => {
   const imageName = imageRegex?.length > 0 ? imageRegex[1] : "";
   const { image, setImage, progress, handleSelectImage, handleDeleteImage } =
     useFirebaseImage(setValue, getValues, imageName, deleteAvatar);
+  const { userInfo } = useAuth();
   const handleUpdateUser = async (values) => {
     if (!isValid) return;
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
     try {
       const colRef = doc(db, "users", userId);
       await updateDoc(colRef, {
@@ -182,6 +190,12 @@ const UserUpdate = () => {
                 User
               </Radio>
             </FieldCheckboxes>
+          </Field>
+        </div>
+        <div className="form-layout">
+          <Field>
+            <Label>Description</Label>
+            <Textarea name="description" control={control}></Textarea>
           </Field>
         </div>
         <Button

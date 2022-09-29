@@ -1,3 +1,4 @@
+import { useAuth } from "contexts/auth-context";
 import {
   deleteObject,
   getDownloadURL,
@@ -6,6 +7,8 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { useState } from "react";
+import Swal from "sweetalert2";
+import { userRole } from "utils/constants";
 
 export default function useFirebaseImage(
   setValue,
@@ -13,10 +16,15 @@ export default function useFirebaseImage(
   imageName = null,
   cb = null
 ) {
+  const { userInfo } = useAuth();
   const [progress, setProgress] = useState(0);
   const [image, setImage] = useState("");
   if (!setValue || !getValues) return;
   const handleUploadImage = (file) => {
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
     const storage = getStorage();
     const storageRef = ref(storage, "images/" + file.name);
     const uploadTask = uploadBytesResumable(storageRef, file);
@@ -39,6 +47,7 @@ export default function useFirebaseImage(
       },
       (error) => {
         console.log("Error");
+        setImage("");
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
@@ -56,6 +65,10 @@ export default function useFirebaseImage(
   };
 
   const handleDeleteImage = () => {
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
     const storage = getStorage();
     const imageRef = ref(
       storage,
@@ -71,6 +84,7 @@ export default function useFirebaseImage(
       .catch((error) => {
         console.log("handleDeleteImage ~ error", error);
         console.log("Can not delete image");
+        setImage("");
       });
   };
   const handleResetUpload = () => {

@@ -1,15 +1,12 @@
-import { async } from "@firebase/util";
-import { db } from "firebase-app/firebase-config";
-import { doc, getDoc } from "firebase/firestore";
 import React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import { withErrorBoundary } from "react-error-boundary";
 import slugify from "slugify";
 import styled from "styled-components";
 import PostCategory from "./PostCategory";
 import PostImage from "./PostImage";
 import PostMeta from "./PostMeta";
 import PostTitle from "./PostTitle";
+
 const PostFeatureItemStyles = styled.div`
   width: 100%;
   border-radius: 16px;
@@ -56,33 +53,12 @@ const PostFeatureItemStyles = styled.div`
 `;
 
 const PostFeatureItem = ({ data }) => {
-  const [category, setCategory] = useState("");
-  const [user, setUser] = useState("");
-  useEffect(() => {
-    async function fetch() {
-      const docRef = doc(db, "categories", data.categoryId);
-      const docSnap = await getDoc(docRef);
-      setCategory(docSnap.data());
-    }
-    fetch();
-  }, [data.categoryId]);
-  useEffect(() => {
-    async function fetchUser() {
-      if (data.userId) {
-        const docRef = doc(db, "users", data.userId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.data) {
-          setUser(docSnap.data());
-        }
-      }
-    }
-    fetchUser();
-  }, [data.userId]);
   if (!data || !data.id) return null;
   const date = data?.createdAt?.seconds
     ? new Date(data?.createdAt?.seconds * 1000)
     : new Date();
   const formatDate = new Date(date).toLocaleDateString("vi-VI");
+  const { category, user } = data;
   return (
     <PostFeatureItemStyles>
       <PostImage url={data.image} alt="unsplash"></PostImage>
@@ -94,7 +70,7 @@ const PostFeatureItem = ({ data }) => {
             <PostCategory to={category.slug}>{category.name}</PostCategory>
           )}
           <PostMeta
-            to={slugify(user?.fullname || "", { lower: true })}
+            to={slugify(user?.username || "", { lower: true })}
             authorName={user?.fullname}
             date={formatDate}
           ></PostMeta>
@@ -107,4 +83,11 @@ const PostFeatureItem = ({ data }) => {
   );
 };
 
-export default PostFeatureItem;
+// Example of error boundary
+export default withErrorBoundary(PostFeatureItem, {
+  FallbackComponent: (
+    <p className="p-3 text-red-500 bg-red-100">
+      Look like this component error
+    </p>
+  ),
+});

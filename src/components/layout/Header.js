@@ -3,7 +3,6 @@ import { useAuth } from "contexts/auth-context";
 import React from "react";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
-
 const menuLinks = [
   {
     url: "/",
@@ -18,11 +17,13 @@ const menuLinks = [
     title: "Contact",
   },
 ];
+
 const HeaderStyles = styled.header`
   padding: 20px 0;
   .header-main {
     display: flex;
     align-items: center;
+    justify-content: space-between;
   }
   .header-auth {
     display: flex;
@@ -64,28 +65,20 @@ const HeaderStyles = styled.header`
     transform: translateY(-50%);
     right: 25px;
   }
-  //res
   @media screen and (max-width: 1023.98px) {
     .logo {
       max-width: 30px;
     }
     .menu,
     .search,
-    .head-button,
+    .header-button,
     .header-auth {
       display: none;
     }
   }
 `;
-// function getLastName(name) {
-//   if (!name) return "User";
-//   const length = name.split(" ").length;
-//   // console.log(name.split(" "));
-//   return name.split(" ")[length - 1];
-// }
 const Header = () => {
   const { userInfo } = useAuth();
-  // console.log("Header ~ userInfo", userInfo);
   return (
     <HeaderStyles>
       <div className="container">
@@ -102,8 +95,7 @@ const Header = () => {
               </li>
             ))}
           </ul>
-
-          <div className="search">
+          {/* <div className="search">
             <input
               type="text"
               className="search-input"
@@ -139,22 +131,18 @@ const Header = () => {
                 />
               </svg>
             </span>
-          </div>
+          </div> */}
           {!userInfo ? (
             <Button
               type="button"
               height="56px"
               className="header-button"
-              to="/sign-up"
+              to="/sign-in"
             >
-              Sign Up
+              Login
             </Button>
           ) : (
             <div className="header-auth">
-              {/* <span>Welcome back, </span>
-              <strong className="text-primary">
-                {getLastName(userInfo?.displayName)}
-              </strong> */}
               <Button
                 type="button"
                 height="56px"

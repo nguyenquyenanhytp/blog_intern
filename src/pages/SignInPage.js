@@ -7,9 +7,9 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { NavLink, useNavigate } from "react-router-dom";
 import AuthenticationPage from "./AuthenticationPage";
-import { toast } from "react-toastify";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "react-toastify";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "firebase-app/firebase-config";
 import InputPasswordToggle from "components/input/InputPasswordToggle";
@@ -24,14 +24,13 @@ const schema = yup.object({
     .min(8, "Your password must be at least 8 characters or greater")
     .required("Please enter your password"),
 });
-
 const SignInPage = () => {
   const {
     handleSubmit,
     control,
     formState: { isValid, isSubmitting, errors },
   } = useForm({
-    mode: "onchange",
+    mode: "onChange",
     resolver: yupResolver(schema),
   });
   useEffect(() => {
@@ -45,7 +44,6 @@ const SignInPage = () => {
   }, [errors]);
   const { userInfo } = useAuth();
   const navigate = useNavigate();
-  //   console.log(userInfo);
   useEffect(() => {
     document.title = "Login Page";
     if (userInfo?.email) navigate("/");
@@ -61,6 +59,7 @@ const SignInPage = () => {
         toast.error("It seems your password was wrong");
     }
   };
+
   return (
     <AuthenticationPage>
       <form
@@ -73,7 +72,7 @@ const SignInPage = () => {
           <Input
             type="email"
             name="email"
-            placeholder="Please enter your email address"
+            placeholder="Enter your email address"
             control={control}
           ></Input>
         </Field>
@@ -82,17 +81,17 @@ const SignInPage = () => {
           <InputPasswordToggle control={control}></InputPasswordToggle>
         </Field>
         <div className="have-account">
-          Do not have an account ?
-          <NavLink to={"/sign-up"}> Register here !</NavLink>
+          You have not had an account?{" "}
+          <NavLink to={"/sign-up"}>Register an account</NavLink>{" "}
         </div>
         <Button
+          kind="primary"
           type="submit"
-          style={{ width: "100%", maxWidth: 300, margin: "0 auto" }}
+          className="w-full max-w-[300px] mx-auto"
           isLoading={isSubmitting}
           disabled={isSubmitting}
         >
-          {/* <LoadingSpinner></LoadingSpinner> */}
-          Sign Up
+          Login
         </Button>
       </form>
     </AuthenticationPage>
