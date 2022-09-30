@@ -61,7 +61,13 @@ const PostFeatureItem = ({ data }) => {
   const { category, user } = data;
   return (
     <PostFeatureItemStyles>
-      <PostImage url={data.image} alt="unsplash"></PostImage>
+      <PostImage
+        url={
+          data.image ||
+          "https://images.unsplash.com/photo-1542744095-70fccefd4b65?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1101&q=80"
+        }
+        alt="unsplash"
+      ></PostImage>
 
       <div className="post-overlay"></div>
       <div className="post-content">

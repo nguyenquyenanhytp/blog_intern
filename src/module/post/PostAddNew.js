@@ -35,10 +35,8 @@ const PostAddNew = () => {
       title: "",
       slug: "",
       status: 2,
-      categoryId: "",
       hot: false,
       image: "",
-      category: {},
       user: {},
     },
   });

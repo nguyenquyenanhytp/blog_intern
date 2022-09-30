@@ -54,7 +54,14 @@ const PostNewestItem = ({ data }) => {
   const formatDate = new Date(date).toLocaleDateString("vi-VI");
   return (
     <PostNewestItemStyles>
-      <PostImage url={data.image} alt="" to={data?.slug}></PostImage>
+      <PostImage
+        url={
+          data.image ||
+          "https://images.unsplash.com/photo-1542744095-70fccefd4b65?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1101&q=80"
+        }
+        alt=""
+        to={data?.slug}
+      ></PostImage>
 
       <div className="post-content">
         <PostCategory to={data?.category?.slug} type="secondary">
