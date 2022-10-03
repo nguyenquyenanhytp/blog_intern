@@ -122,7 +122,7 @@ const PostManage = () => {
     setLastDoc(lastVisible);
   };
   // const { userInfo } = useAuth();
-  // if (userInfo.role !== userRole.ADMIN) return null;
+  if (userInfo.role !== userRole.ADMIN) return null;
   return (
     <div>
       <DashboardHeading
@@ -164,16 +164,21 @@ const PostManage = () => {
 
               return (
                 <tr key={post.id}>
-                  <td>{post.id?.slice(0, 5) + "..."}</td>
+                  <td title={post.id}>{post.id?.slice(0, 5) + "..."}</td>
                   <td className="!pr-[100px]">
                     <div className="flex items-center gap-x-3">
                       <img
-                        src={post.image}
+                        src={
+                          post.image ||
+                          "https://images.unsplash.com/photo-1542744095-70fccefd4b65?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1101&q=80"
+                        }
                         alt=""
                         className="w-[66px] h-[55px] rounded object-cover"
                       />
                       <div className="flex-1">
-                        <h3 className="font-semibold">{post.title}</h3>
+                        <h3 className="font-semibold" title={post.title}>
+                          {post.title?.slice(0, 25) + "..."}
+                        </h3>
                         <time className="text-sm text-gray-500">
                           Date: {formatDate}
                         </time>

@@ -1,6 +1,12 @@
 import Heading from "components/layout/Heading";
 import { db } from "firebase-app/firebase-config";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import {
+  collection,
+  limit,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import PostItem from "./PostItem";
 
@@ -9,7 +15,8 @@ const PostRelated = ({ categoryId = "" }) => {
   useEffect(() => {
     const docRef = query(
       collection(db, "posts"),
-      where("categoryId", "==", categoryId)
+      where("category.id", "==", categoryId),
+      limit(4)
     );
     onSnapshot(docRef, (snapshot) => {
       const results = [];

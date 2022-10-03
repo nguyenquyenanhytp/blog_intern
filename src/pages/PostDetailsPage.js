@@ -132,7 +132,10 @@ const PostDetailsPage = () => {
         <div className="container">
           <div className="post-header">
             <PostImage
-              url={postInfo.image}
+              url={
+                postInfo.image ||
+                "https://images.unsplash.com/photo-1542744095-70fccefd4b65?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1101&q=80"
+              }
               className="post-feature"
             ></PostImage>
             <div className="post-info">

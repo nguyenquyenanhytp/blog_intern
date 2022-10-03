@@ -1,8 +1,14 @@
 import { Button } from "components/button";
 import { useAuth } from "contexts/auth-context";
+import { db } from "firebase-app/firebase-config";
+import { collection, doc, onSnapshot } from "firebase/firestore";
 import React from "react";
+import { useId } from "react";
 import { Link, NavLink } from "react-router-dom";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useState } from "react";
 const DashboardHeaderStyles = styled.div`
   background-color: white;
   padding: 20px;
@@ -42,14 +48,14 @@ const DashboardHeader = () => {
   return (
     <DashboardHeaderStyles>
       <NavLink to="/" className="logo">
-        <img srcSet="/logo.png 2x" alt="monkey-blogging" className="logo" />
-        <span className="hidden lg:inline-block">Monkey Blogging</span>
+        <img srcSet="/logo3.png 2x" alt="monkey-blogging" className="logo" />
+        <span className="hidden lg:inline-block">Duolingo Tech Blog</span>
       </NavLink>
       <div className="header-right">
         <Button to="/manage/add-post" className="header-button" height="52px">
           Write new post
         </Button>
-        <Link to="/profile" className="header-avatar">
+        <Link to={`/profile/${userInfo.uid}`} className="header-avatar">
           <img src={userInfo?.avatar} alt="" />
         </Link>
       </div>

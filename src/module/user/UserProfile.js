@@ -3,21 +3,85 @@ import { Field } from "components/field";
 import ImageUpload from "components/image/ImageUpload";
 import { Input } from "components/input";
 import { Label } from "components/label";
+import { useAuth } from "contexts/auth-context";
+import { db } from "firebase-app/firebase-config";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import useFirebaseImage from "hooks/useFirebaseImage";
 import DashboardHeading from "module/dashboard/DashboardHeading";
 import React from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useParams, useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import { userRole } from "utils/constants";
 
 const UserProfile = () => {
-  const { control } = useForm({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    getValues,
+    setValue,
+    formState: { isValid, isSubmitting },
+  } = useForm({
     mode: "onChange",
   });
+  // const { userId } = useParams();
+  const [params] = useSearchParams();
+  const userId = params.get("uid");
+  const imageUrl = getValues("avatar");
+  const imageRegex = /%2F(\S+)\?/gm.exec(imageUrl);
+  const imageName = imageRegex?.length > 0 ? imageRegex[1] : "";
+  const { image, setImage, progress, handleSelectImage, handleDeleteImage } =
+    useFirebaseImage(setValue, getValues, imageName, deleteAvatar);
+  const { userInfo } = useAuth();
+  const handleUpdateUser = async (values) => {
+    if (!isValid) return;
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
+    try {
+      const colRef = doc(db, "users", userId);
+      await updateDoc(colRef, {
+        ...values,
+        avatar: image,
+      });
+      toast.success("Update user information successfully!");
+    } catch (error) {
+      console.log(error);
+      toast.error("Update user failed!");
+    }
+  };
+
+  async function deleteAvatar() {
+    const colRef = doc(db, "users", userId);
+    await updateDoc(colRef, {
+      avatar: "",
+    });
+  }
+  useEffect(() => {
+    setImage(imageUrl);
+  }, [imageUrl, setImage]);
+  useEffect(() => {
+    async function fetchData() {
+      if (!userId) return;
+      const colRef = doc(db, "users", userId);
+      const docData = await getDoc(colRef);
+      reset(docData && docData.data());
+    }
+    fetchData();
+  }, [userId, reset]);
+
+  if (!userId) return null;
   return (
     <div>
       <DashboardHeading
         title="Account information"
         desc="Update your account information"
       ></DashboardHeading>
-      <form>
+      <form onSubmit={handleSubmit(handleUpdateUser)}>
         <div className="text-center mb-10">
           <ImageUpload className="!w-[200px] h-[200px] !rounded-full min-h-0 mx-auto"></ImageUpload>
         </div>
@@ -89,7 +153,7 @@ const UserProfile = () => {
             ></Input>
           </Field>
         </div>
-        <Button kind="primary" className="mx-auto w-[200px]">
+        <Button type="submit" kind="primary" className="mx-auto w-[200px]">
           Update
         </Button>
       </form>

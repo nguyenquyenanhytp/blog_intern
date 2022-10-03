@@ -6,14 +6,14 @@ import PostItem from "module/post/PostItem";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-const CategoryPage = () => {
-  const [posts, setPosts] = useState([]);
+const UserPage = () => {
+  const [authorPosts, setAuthorPosts] = useState([]);
   const params = useParams();
   useEffect(() => {
     async function fetchData() {
       const docRef = query(
         collection(db, "posts"),
-        where("category.slug", "==", params.slug)
+        where("user.username", "==", params.username)
       );
       onSnapshot(docRef, (snapshot) => {
         const results = [];
@@ -23,19 +23,19 @@ const CategoryPage = () => {
             ...doc.data(),
           });
         });
-        setPosts(results);
+        setAuthorPosts(results);
       });
     }
     fetchData();
-  }, [params.slug]);
-  if (posts.length <= 0) return null;
+  }, [params.username]);
+  if (authorPosts.length <= 0) return null;
   return (
     <Layout>
       <div className="container">
         <div className="pt-10"></div>
-        <Heading>Danh mục : {params.slug}</Heading>
+        <Heading>Danh mục tác giả: {params.username}</Heading>
         <div className="grid-layout grid-layout--primary">
-          {posts.map((item) => (
+          {authorPosts.map((item) => (
             <PostItem key={item.id} data={item}></PostItem>
           ))}
         </div>
@@ -44,4 +44,4 @@ const CategoryPage = () => {
   );
 };
 
-export default CategoryPage;
+export default UserPage;

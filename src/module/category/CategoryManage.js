@@ -109,6 +109,8 @@ const CategoryManage = () => {
   const handleInputFilter = debounce((e) => {
     setFilter(e.target.value);
   }, 500);
+  // const { userInfo } = useAuth();
+  if (userInfo.role !== userRole.ADMIN) return null;
   return (
     <div>
       <DashboardHeading title="Categories" desc="Manage your category">

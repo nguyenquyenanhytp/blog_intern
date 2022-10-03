@@ -84,7 +84,11 @@ const Header = () => {
       <div className="container">
         <div className="header-main">
           <NavLink to="/">
-            <img srcSet="/logo.png 2x" alt="monkey-blogging" className="logo" />
+            <img
+              srcSet="/logo3.png 2x"
+              alt="monkey-blogging"
+              className="logo"
+            />
           </NavLink>
           <ul className="menu">
             {menuLinks.map((item) => (

@@ -3,7 +3,6 @@ import { LabelStatus } from "components/label";
 import { Table } from "components/table";
 import { useAuth } from "contexts/auth-context";
 import { db } from "firebase-app/firebase-config";
-import { deleteUser } from "firebase/auth";
 import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import React, { useState } from "react";
 import { useEffect } from "react";

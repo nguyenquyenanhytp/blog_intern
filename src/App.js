@@ -1,3 +1,4 @@
+import UserPage from "pages/UserPage";
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/auth-context";
@@ -45,6 +46,10 @@ function App() {
               element={<CategoryPage></CategoryPage>}
             ></Route>
             <Route
+              path="/author/:username"
+              element={<UserPage></UserPage>}
+            ></Route>
+            <Route
               path="/:slug"
               element={<PostDetailsPage></PostDetailsPage>}
             ></Route>
@@ -90,7 +95,7 @@ function App() {
                 element={<UserUpdate></UserUpdate>}
               ></Route>
               <Route
-                path="/profile"
+                path="/profile/:uid"
                 element={<UserProfile></UserProfile>}
               ></Route>
             </Route>
