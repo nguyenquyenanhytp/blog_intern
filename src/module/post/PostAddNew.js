@@ -1,7 +1,7 @@
 import useFirebaseImage from "hooks/useFirebaseImage";
 import Toggle from "components/toggle/Toggle";
 import slugify from "slugify";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ImageUpload from "components/image/ImageUpload";
 import { useForm } from "react-hook-form";
 import { useAuth } from "contexts/auth-context";
@@ -14,6 +14,7 @@ import { Field, FieldCheckboxes } from "components/field";
 import { Dropdown } from "components/dropdown";
 import { db } from "firebase-app/firebase-config";
 import { Button } from "components/button";
+import ImageUploader from "quill-image-uploader";
 import {
   addDoc,
   collection,
@@ -26,6 +27,11 @@ import {
 } from "firebase/firestore";
 import DashboardHeading from "module/dashboard/DashboardHeading";
 import Swal from "sweetalert2";
+import ReactQuill, { Quill } from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import axios from "axios";
+import { imgbbAPI } from "config/apiConfig";
+Quill.register("modules/imageUploader", ImageUploader);
 
 const PostAddNew = () => {
   const { userInfo } = useAuth();
@@ -42,6 +48,7 @@ const PostAddNew = () => {
   });
   const watchStatus = watch("status");
   const watchHot = watch("hot");
+  const [content, setContent] = useState("");
   const {
     image,
     handleResetUpload,
@@ -122,7 +129,7 @@ const PostAddNew = () => {
     getData();
   }, []);
   useEffect(() => {
-    document.title = "Monkey Blogging - Add new post";
+    document.title = "Tech Blogging - Add new post";
   }, []);
 
   const handleClickOption = async (item) => {
@@ -134,6 +141,35 @@ const PostAddNew = () => {
     });
     setSelectCategory(item);
   };
+  const modules = useMemo(
+    () => ({
+      toolbar: [
+        ["bold", "italic", "underline", "strike"],
+        ["blockquote"],
+        [{ header: 1 }, { header: 2 }], // custom button values
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ header: [1, 2, 3, 4, 5, 6, false] }],
+        ["link", "image"],
+      ],
+      imageUploader: {
+        // imgbbAPI
+        upload: async (file) => {
+          const bodyFormData = new FormData();
+          bodyFormData.append("image", file);
+          const response = await axios({
+            method: "post",
+            url: imgbbAPI,
+            data: bodyFormData,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+          return response.data.data.url;
+        },
+      },
+    }),
+    []
+  );
 
   return (
     <>
@@ -192,6 +228,20 @@ const PostAddNew = () => {
             )}
           </Field>
         </div>
+        <div className="mb-10">
+          <Field>
+            <Label>Content</Label>
+            <div className="w-full entry-content">
+              <ReactQuill
+                modules={modules}
+                theme="snow"
+                value={content}
+                onChange={setContent}
+              />
+            </div>
+          </Field>
+        </div>
+
         <div className="form-layout">
           <Field>
             <Label>Feature post</Label>

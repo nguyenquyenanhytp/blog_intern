@@ -21,10 +21,10 @@ export default function useFirebaseImage(
   const [image, setImage] = useState("");
   if (!setValue || !getValues) return;
   const handleUploadImage = (file) => {
-    if (userInfo?.role !== userRole.ADMIN) {
-      Swal.fire("Failed", "You have no right to do this action", "warning");
-      return;
-    }
+    // if (userInfo?.role !== userRole.ADMIN) {
+    //   Swal.fire("Failed", "You have no right to do this action", "warning");
+    //   return;
+    // }
     const storage = getStorage();
     const storageRef = ref(storage, "images/" + file.name);
     const uploadTask = uploadBytesResumable(storageRef, file);
@@ -65,10 +65,10 @@ export default function useFirebaseImage(
   };
 
   const handleDeleteImage = () => {
-    if (userInfo?.role !== userRole.ADMIN) {
-      Swal.fire("Failed", "You have no right to do this action", "warning");
-      return;
-    }
+    // if (userInfo?.role !== userRole.ADMIN) {
+    //   Swal.fire("Failed", "You have no right to do this action", "warning");
+    //   return;
+    // }
     const storage = getStorage();
     const imageRef = ref(
       storage,

@@ -14,7 +14,6 @@ import { useForm } from "react-hook-form";
 import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
-import { userRole } from "utils/constants";
 
 const UserProfile = () => {
   const {
@@ -27,9 +26,7 @@ const UserProfile = () => {
   } = useForm({
     mode: "onChange",
   });
-  // const { userId } = useParams();
-  const [params] = useSearchParams();
-  const userId = params.get("uid");
+  const { uid } = useParams();
   const imageUrl = getValues("avatar");
   const imageRegex = /%2F(\S+)\?/gm.exec(imageUrl);
   const imageName = imageRegex?.length > 0 ? imageRegex[1] : "";
@@ -38,12 +35,12 @@ const UserProfile = () => {
   const { userInfo } = useAuth();
   const handleUpdateUser = async (values) => {
     if (!isValid) return;
-    if (userInfo?.role !== userRole.ADMIN) {
-      Swal.fire("Failed", "You have no right to do this action", "warning");
-      return;
-    }
+    // if (userInfo?.role !== userRole.ADMIN) {
+    //   Swal.fire("Failed", "You have no right to do this action", "warning");
+    //   return;
+    // }
     try {
-      const colRef = doc(db, "users", userId);
+      const colRef = doc(db, "users", uid);
       await updateDoc(colRef, {
         ...values,
         avatar: image,
@@ -56,7 +53,7 @@ const UserProfile = () => {
   };
 
   async function deleteAvatar() {
-    const colRef = doc(db, "users", userId);
+    const colRef = doc(db, "users", uid);
     await updateDoc(colRef, {
       avatar: "",
     });
@@ -66,15 +63,15 @@ const UserProfile = () => {
   }, [imageUrl, setImage]);
   useEffect(() => {
     async function fetchData() {
-      if (!userId) return;
-      const colRef = doc(db, "users", userId);
+      if (!uid) return;
+      const colRef = doc(db, "users", uid);
       const docData = await getDoc(colRef);
       reset(docData && docData.data());
     }
     fetchData();
-  }, [userId, reset]);
+  }, [uid, reset]);
 
-  if (!userId) return null;
+  if (!uid) return null;
   return (
     <div>
       <DashboardHeading
@@ -83,7 +80,13 @@ const UserProfile = () => {
       ></DashboardHeading>
       <form onSubmit={handleSubmit(handleUpdateUser)}>
         <div className="text-center mb-10">
-          <ImageUpload className="!w-[200px] h-[200px] !rounded-full min-h-0 mx-auto"></ImageUpload>
+          <ImageUpload
+            className="!w-[200px] h-[200px] !rounded-full min-h-0 mx-auto"
+            onChange={handleSelectImage}
+            handleDeleteImage={handleDeleteImage}
+            progress={progress}
+            image={image}
+          ></ImageUpload>
         </div>
         <div className="form-layout">
           <Field>

@@ -7,6 +7,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import PostItem from "module/post/PostItem";
 import PostNewestItem from "module/post/PostNewestItem";
 import PostNewestLarge from "module/post/PostNewestLarge";
 import React from "react";
@@ -72,6 +73,12 @@ const HomeNewest = () => {
                 <PostNewestItem key={v4()} data={item}></PostNewestItem>
               ))}
           </div>
+        </div>
+        <div className="grid-layout grid-layout--primary">
+          <PostItem></PostItem>
+          <PostItem></PostItem>
+          <PostItem></PostItem>
+          <PostItem></PostItem>
         </div>
       </div>
     </HomeNewestStyles>
